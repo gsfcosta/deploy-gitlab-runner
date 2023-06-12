@@ -1,0 +1,51 @@
+gitlabUrl: https://gitlab.domain/
+# image:
+#   registry: registry.gitlab.com
+#   image: gitlab-org/gitlab-runner
+
+
+
+# Update the security context values to the user ID in the ubuntu image
+# securityContext:
+#   fsGroup: 999
+#   runAsUser: 999
+runnerRegistrationToken: "token"
+# runners:
+
+#         image = "ubuntu:22.04"
+#   secret: gitlab-runner-secret
+rbac:
+    create: true
+    rules:
+      - apiGroups: ["*"]
+certsSecretName: ca-cert
+runners:
+  config: |
+    [[runners]]    
+      [runners.kubernetes]
+      image = "ubuntu:20.04"
+      privileged = true
+      [[runners.kubernetes.volumes.host_path]]
+      name = "docker"
+      mount_path = "/var/run/docker.sock"
+      read_only = true
+      host_path = "/var/run/docker.sock"
+  # clone_url: "https://gitlab.domain"
+  name: "runner"
+  # executor: docker
+# envVars:
+#   - name: RUNNER_EXECUTOR
+#     value: docker
+
+volumeMounts:
+  # Example:
+  - name: shared-conf
+    mountPath: /kubeconfig
+
+# ## Additional volumes to add to the runner deployment
+# ##
+volumes:
+  # Example:
+  - name: shared-conf
+    secret:
+      secretName: shared-config
